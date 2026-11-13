@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Firm benchmarks · prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@600;700&display=swap">
+<style>
+:root{--page:#FAF9F7;--card:#fff;--ink:#050911;--body:#212529;--muted:#585C64;--soft:#6B6F77;--line:#EBEDF1;--hair:rgba(15,23,42,.1);--sunk:#F1F2EE;--cobalt:#0025DE;--cobalt-050:#EAEEFF;--cobalt-100:#D3DBFF;--cobalt-ink:#001BA1;--pub:#85A9E3;--pub-light:#D3DBFF;--neg:#B6B0A6;--neg-light:#E7E3DE;--ok-bg:rgba(4,180,106,.18);--ok:#03643B;--warn-bg:#FFF1DB;--warn:#8A4B00;--risk-bg:#FFF4EC;--risk:#9A3412}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--page);color:var(--muted);font:14px/1.45 Inter,system-ui,sans-serif}
+a{color:var(--cobalt);text-decoration:none}a:hover{text-decoration:underline}
+button,input,select{font:inherit}
+h1,h2{margin:0;color:var(--ink)}
+.app{display:flex;min-height:100vh}
+.side{flex:0 0 232px;background:#fff;border-right:1px solid var(--line);padding:10px 8px;display:flex;flex-direction:column;gap:2px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{font-size:15px;font-weight:600;color:var(--ink);padding:4px 6px 14px}
+.sec{font-size:12px;font-weight:700;color:var(--muted);padding:12px 6px 4px}
+.nav{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:8px;color:#282C34;font-size:14px;white-space:nowrap;border:0;background:none;text-align:left;width:100%;cursor:pointer}
+.nav:hover{background:var(--sunk);text-decoration:none}
+.nav[aria-current=page]{background:#EDEEEA;font-weight:500}
+.nav svg{flex:none}
+.nav .dim{color:#A3A3A3}
+.pro{margin-left:auto;height:18px;padding:0 6px;border-radius:6px;background:var(--cobalt-050);color:var(--cobalt-ink);font-size:10px;font-weight:700;display:inline-flex;align-items:center}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.top{height:44px;display:flex;align-items:center;gap:10px;padding:0 14px;background:#fff;border-bottom:1px solid var(--line)}
+.top .menu{display:none}
+.notice{font-size:12px;color:var(--soft)}
+.notice b{color:var(--ink);font-weight:600}
+.pill{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:8px;font-size:11px;font-weight:700}
+.head{background:#fff;border-bottom:1px solid var(--line)}
+.wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+.head .wrap{padding-top:22px;padding-bottom:16px}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.4px;color:var(--cobalt);text-transform:uppercase}
+.h1{font-family:'Inter Tight',Inter,sans-serif;font-size:40px;font-weight:700;letter-spacing:-.8px;line-height:1.1;margin-top:2px}
+.sub{margin:6px 0 0;font-size:14px}
+.q{margin-top:16px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:17px;color:var(--ink);line-height:36px}
+.q .w{color:var(--muted)}
+.dd{position:relative;display:inline-block}
+.chip{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px 0 14px;background:#fff;border:1px solid #DCDDDC;border-radius:8px;font-size:15px;font-weight:600;color:var(--ink);cursor:pointer}
+.chip:hover{border-color:#A3A3A3}
+.chip[aria-expanded=true]{border-color:var(--cobalt);box-shadow:0 0 0 3px var(--cobalt-050)}
+.cmprow{margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px}
+.cmp{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;border:1px dashed #A3A3A3;background:#fff;font-size:13px;font-weight:600;color:#3F434A;cursor:pointer}
+.cmp.on{border:1px solid var(--cobalt);background:var(--cobalt-050);color:var(--cobalt-ink)}
+.num{width:120px;height:32px;padding:0 8px;border:1px solid #B9C6F5;border-radius:8px;font-size:14px;font-weight:600;color:var(--ink)}
+.pop{position:absolute;top:calc(100% + 6px);left:0;z-index:40;min-width:240px;padding:6px;background:#fff;border:1px solid rgba(15,23,42,.12);border-radius:8px;box-shadow:0 12px 32px -12px rgba(15,23,42,.28);line-height:1.3}
+.pop.right{left:auto;right:0}
+.opt{display:flex;align-items:flex-start;gap:10px;width:100%;padding:8px 10px;border:0;background:none;border-radius:6px;font-size:13.5px;color:var(--ink);text-align:left;cursor:pointer}
+.opt:hover{background:var(--sunk)}
+.opt .ck{width:14px;color:var(--cobalt)}
+.opt small{display:block;font-size:12px;color:var(--soft);margin-top:2px}
+.body{padding:20px 24px 64px;display:flex;flex-direction:column;gap:16px;max-width:1000px;width:100%;margin:0 auto}
+.card{position:relative;background:#fff;border:1px solid var(--hair);border-radius:6px;box-shadow:0 1px 0 rgba(15,23,42,.04),0 8px 24px -16px rgba(15,23,42,.1)}
+.card.full{position:fixed;inset:24px;z-index:60;overflow:auto}
+.ch{display:flex;align-items:flex-start;gap:8px;padding:16px 16px 6px 20px}
+.ch .t{flex:1;min-width:0}
+.ch h2{font-size:16px;font-weight:600}
+.ch p{margin:2px 0 0;font-size:12.5px;color:var(--soft)}
+.icb{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:0;border-radius:6px;background:none;color:#5A5B5A;cursor:pointer}
+.icb:hover{background:var(--sunk);color:var(--ink)}
+.cb{padding:6px 20px 18px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:16px}
+.big{font-family:'Inter Tight',Inter,sans-serif;font-size:56px;font-weight:700;letter-spacing:-1.4px;color:var(--ink);line-height:1.05}
+.big small{font-family:Inter;font-size:18px;font-weight:500;letter-spacing:0;color:var(--muted)}
+.ppill{display:inline-flex;align-items:center;height:30px;padding:0 12px;border-radius:999px;background:var(--cobalt-050);color:var(--cobalt-ink);font-size:14px;font-weight:600}
+.lead{margin:8px 0 0;font-size:14.5px;color:var(--body);max-width:740px}
+.range{position:relative;height:30px;margin-top:40px}
+.range .thin,.range .thick,.range .med,.range .you,.range .tag{position:absolute}
+.thin{top:13px;height:4px;background:var(--pub-light);border-radius:2px}
+.thick{top:6px;height:18px;background:var(--pub);border-radius:5px}
+.med{top:3px;height:24px;width:2px;margin-left:-1px;background:var(--ink)}
+.you{top:-6px;bottom:-2px;border-left:2px solid var(--cobalt)}
+.you.est{border-left-style:dashed}
+.tag{top:-28px;transform:translateX(-50%);padding:1px 7px;border-radius:4px;background:var(--cobalt);color:#fff;border:1px solid var(--cobalt);font-size:11px;font-weight:600;white-space:nowrap}
+.tag.est{background:#fff;color:var(--cobalt-ink)}
+.rl{position:relative;height:18px;margin-top:4px}
+.rl span{position:absolute;transform:translateX(-50%);font-size:11.5px;white-space:nowrap}
+.cap{margin-top:4px;font-size:11.5px;color:var(--soft)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin-top:18px;border-top:1px solid var(--line)}
+.kpi{padding:14px 16px 0 0}
+.kpi .l{font-size:12px}
+.kpi .v{font-size:22px;font-weight:600;letter-spacing:-.4px;color:var(--ink);margin-top:2px}
+.kpi .s{font-size:12px;color:var(--soft);margin-top:2px}
+.rows{padding:4px 12px 12px}
+.row{display:grid;grid-template-columns:150px minmax(0,1fr) 140px;align-items:center;gap:12px;width:100%;padding:6px 8px;border:0;border-radius:6px;background:none;text-align:left;cursor:pointer}
+.row:hover{background:var(--page)}
+.row.sel{background:#F3F5FF}
+.row .n{font-size:13px;color:var(--ink)}
+.row.sel .n{font-weight:600}
+.row .bar{position:relative;height:22px;display:block}
+.row .bar span{position:absolute;display:block}
+.row .v{text-align:right;line-height:1.2}
+.row .v b{display:block;font-size:13px;color:var(--ink)}
+.row .v i{display:block;font-style:normal;font-size:11.5px;color:var(--soft)}
+.dia{top:5px;width:11px;height:11px;margin-left:-5.5px;background:var(--cobalt);border:2px solid var(--cobalt);transform:rotate(45deg)}
+.dia.est{background:#fff}
+.dia.risk{background:#C2410C;border-color:#C2410C}
+.legend{display:flex;flex-wrap:wrap;gap:14px;padding:4px 20px 16px;font-size:11.5px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.2px;color:var(--soft);background:#F1F2ED;padding:7px 8px;text-align:right}
+th:first-child,td:first-child{text-align:left;padding-left:20px}
+th:last-child,td:last-child{padding-right:20px}
+td{padding:9px 8px;text-align:right;border-bottom:1px solid var(--line);color:var(--body)}
+tr.sel td{font-weight:600;color:var(--ink)}
+tbody tr:hover td{background:var(--page)}
+.tblwrap{overflow-x:auto}
+.foot{margin:0;padding:12px 20px 16px;font-size:12px;color:var(--soft)}
+.chart{position:relative;margin:8px 20px 0 64px}
+.chart svg{display:block;width:100%;overflow:visible}
+.ylab{position:absolute;left:-58px;transform:translateY(-50%);font-size:11px;color:var(--soft)}
+.xlab{position:relative;height:22px;margin:0 20px 0 64px}
+.xlab span{position:absolute;top:6px;transform:translateX(-50%);font-size:11px;color:var(--soft)}
+.ghost{display:inline-flex;align-items:center;height:32px;padding:0 14px;border-radius:999px;border:1px solid rgba(15,23,42,.16);background:#fff;font-size:13px;font-weight:600;color:var(--body);cursor:pointer;white-space:nowrap}
+.ghost:hover{border-color:rgba(15,23,42,.32)}
+.unlock{display:flex;align-items:center;gap:16px;padding:16px 20px;border-radius:6px;border:1px dashed #B9C6F5;background:#F7F8FF}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.tile{background:#fff;border:1px solid var(--hair);border-radius:6px;padding:16px 18px;box-shadow:0 1px 0 rgba(15,23,42,.04),0 8px 24px -16px rgba(15,23,42,.1)}
+.tile .l{font-size:11.5px;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+.tile .v{font-size:30px;font-weight:600;letter-spacing:-.6px;color:var(--ink);margin-top:4px}
+.tile .s{font-size:12px;color:var(--soft)}
+.li{display:flex;align-items:center;gap:12px;padding:11px 20px;border-top:1px solid var(--line)}
+.tip{position:fixed;z-index:90;pointer-events:none;padding:8px 10px;border-radius:6px;background:var(--ink);color:#fff;font-size:12px;line-height:1.45;white-space:pre;box-shadow:0 8px 20px -8px rgba(5,9,17,.5);display:none}
+.scrim{position:fixed;inset:0;z-index:55;background:rgba(5,9,17,.45);border:0}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:95;padding:10px 16px;border-radius:8px;background:var(--ink);color:#fff;font-size:13px}
+.about{font-size:12px;color:var(--soft);margin:4px 0 0}
+@media (max-width:820px){
+  .side{position:fixed;left:0;top:0;bottom:0;z-index:70;transform:translateX(-100%);transition:transform .2s;box-shadow:0 0 40px rgba(0,0,0,.2)}
+  .app.navopen .side{transform:none}
+  .top .menu{display:inline-flex}
+  .wrap,.body{padding-left:16px;padding-right:16px}
+  .h1{font-size:30px}.big{font-size:42px}
+  .row{grid-template-columns:110px minmax(0,1fr) 92px;gap:8px}
+  .grid2{grid-template-columns:1fr}
+  .chart{margin-left:52px}.xlab{margin-left:52px}
+  .notice{display:none}
+  .rl span:not(:nth-child(2)){display:none}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div class="tip" id="tip" role="tooltip"></div>
+<script>
+/* ============================================================
+   Data layer. Illustrative numbers only, shaped on Benchmark
+   aggregates. Nothing here comes from a live API.
+   ============================================================ */
+const DATA = { source: 'illustrative', asOf: null, real: null };
+const LEVELS = ['Partner', 'Counsel', 'Senior associate', 'Associate', 'Junior associate', 'Paralegal'];
+const PUB = { 'Partner': [854, 1209, 1483, 1899, 2237], 'Counsel': [859, 951, 1303, 1450, 1787], 'Senior associate': [813, 967, 1109, 1404, 1606], 'Associate': [616, 733, 841, 1064, 1217], 'Junior associate': [485, 577, 662, 837, 958], 'Paralegal': [270, 415, 455, 539, 631] };
+const NEGR = { 'Partner': .906, 'Counsel': .913, 'Senior associate': .866, 'Associate': .939, 'Junior associate': .906, 'Paralegal': .967 };
+const FIRMS = { 'Partner': 20, 'Counsel': 14, 'Senior associate': 7, 'Associate': 18, 'Junior associate': 6, 'Paralegal': 15 };
+const NRATES = { 'Partner': 142, 'Counsel': 50, 'Senior associate': 26, 'Associate': 127, 'Junior associate': 18, 'Paralegal': 33 };
+const CARD = { 'Partner': 1295, 'Counsel': 1150, 'Senior associate': 1045, 'Associate': 760, 'Junior associate': 610, 'Paralegal': 430 };
+const EST = { 'Partner': 1240, 'Counsel': 1110, 'Senior associate': null, 'Associate': 735, 'Junior associate': null, 'Paralegal': 415 };
+const OFFICES = { 'New York': [1, 1, 1], 'Chicago': [.8, .84, .7], 'Washington, DC': [.9, .88, .8], 'Los Angeles': [.94, .9, .6] };
+const PEERS = { 'similar-size firms': [1, 1, 'firms with 200–800 attorneys'], 'AmLaw 101–200 firms': [.94, 1.35, 'ranked 101–200 by revenue'], 'all firms': [.86, 8, 'every firm with rates here'] };
+const PRACTICES = { 'all practices': [1, 1, 1], 'litigation': [1.03, 1.04, .6], 'corporate & M&A': [1.09, .99, .5], 'labor & employment': [.84, .9, .35] };
+const YF = [.70, .73, .77, .81, .85, .89, .945, 1, 1.055], YY = [.72, .745, .78, .82, .86, .9, .95, 1];
+const SIZES = [['Boutique', '1–50 attorneys', .6], ['Small', '51–200', .66], ['Mid-size', '201–500', .86, true], ['Large', '501–1,000', 1.04], ['BigLaw', '1,001+', 1.45]];
+
+const ROLES = ['1st-year associate', '2nd-year associate', '3rd-year associate', '4th-year associate', '5th-year associate', '6th-year associate', '7th-year associate', '8th-year associate', 'Counsel', 'Paralegal'];
+const SMKT = [200, 210, 230, 255, 285, 310, 330, 345, 360, 98], SBON = [20, 25, 35, 50, 65, 80, 90, 100, 90, 8], SYOU = [195, 205, 220, 240, 262, 288, 305, 322, 350, 92], STOP = [225, 235, 260, 310, 365, 390, 420, 435, 450, 112];
+const SFIRMS = [24, 24, 23, 22, 21, 20, 17, 14, 12, 22], SN = [96, 88, 81, 74, 66, 58, 41, 30, 34, 120];
+const QM = [.84, .92, 1, 1.06, 1.12];
+
+const MTYPES = {
+  'patent defense (NPE)': { base: 2.1, ph: ['pleadings', 'discovery', 'claim construction', 'trial', 'appeal'], cum: [.12, .55, .72, 1, 1.25], def: 3, n: 61, mix: [.17, .05, .2, .27, .17, .14] },
+  'employment dispute': { base: .42, ph: ['pleadings', 'discovery', 'summary judgment', 'trial', 'appeal'], cum: [.15, .6, .75, 1, 1.2], def: 2, n: 88, mix: [.2, .04, .16, .32, .12, .16] },
+  'commercial contract dispute': { base: 1.3, ph: ['pleadings', 'discovery', 'summary judgment', 'trial', 'appeal'], cum: [.14, .58, .74, 1, 1.22], def: 3, n: 54, mix: [.18, .06, .2, .26, .16, .14] },
+  'M&A, public target (buy side)': { base: 3.2, ph: ['diligence', 'signing', 'regulatory review', 'closing'], cum: [.3, .75, .9, 1], def: 3, n: 37, mix: [.22, .08, .22, .24, .14, .1] },
+  'Chapter 11, debtor counsel': { base: 6.5, ph: ['first-day motions', 'plan filed', 'confirmation', 'emergence'], cum: [.1, .6, .9, 1], def: 3, n: 26, mix: [.24, .08, .2, .24, .12, .12] } };
+const STAKES = { 'under $1M at stake': .4, '$1–10M at stake': 1, '$10–25M at stake': 1.65, 'over $25M at stake': 2.5 };
+const MPEERS = { 'similar-size firms': [.88, .45], 'AmLaw 101–200 firms': [.95, .55], 'all firms': [1, 1] };
+const MQ = [.52, .76, 1, 1.33, 1.85];
+
+/* ---------- helpers ---------- */
+const r5 = v => Math.round(v / 5) * 5;
+const $ = v => '$' + r5(v).toLocaleString('en-US');
+const k$ = v => '$' + Math.round(v) + 'k';
+const M$ = v => v >= 1 ? '$' + v.toFixed(v >= 10 ? 1 : 2).replace(/\.?0+$/, '') + 'M' : '$' + Math.round(v * 1000) + 'k';
+const pc = x => Math.round(x * 100) + '%';
+const ord = n => { const s = ['th', 'st', 'nd', 'rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function pctOf(v, q) { const P = [10, 25, 50, 75, 90]; if (v <= q[0]) return Math.max(1, Math.round(10 - (q[0] - v) / (q[1] - q[0]) * 15)); if (v >= q[4]) return Math.min(99, Math.round(90 + (v - q[4]) / (q[4] - q[3]) * 15)); for (let i = 0; i < 4; i++) if (v <= q[i + 1]) return Math.round(P[i] + (v - q[i]) / (q[i + 1] - q[i]) * (P[i + 1] - P[i])); return 50; }
+const scale = (lo, hi) => v => +((v - lo) / (hi - lo) * 100).toFixed(2);
+function ticks(lo, hi, steps) { const span = hi - lo, st = steps.find(s => span / s <= 5) || steps[steps.length - 1], out = []; for (let v = Math.ceil(lo / st) * st; v <= hi + 1e-9; v += st) out.push(+v.toFixed(2)); return out; }
+
+/* ---------- state (kept in the URL hash so links reopen the same view) ---------- */
+const DEFAULTS = {
+  rates: { level: 'Partner', office: 'New York', peer: 'similar-size firms', practice: 'all practices', cmp: 'none', typed: 1350 },
+  salaries: { role: '5th-year associate', office: 'New York', peer: 'similar-size firms', cmp: 'none', typed: 285 },
+  matters: { type: 'patent defense (NPE)', stakes: '$1–10M at stake', phase: 3, peer: 'similar-size firms', cmp: 'none', typed: 2000000 },
+  visibility: { practice: 'patent litigation', peers: 'our 12 named peers' } };
+const ST = { route: 'rates', v: JSON.parse(JSON.stringify(DEFAULTS)), open: null, full: null, done: {}, toast: null };
+function readHash() {
+  const [r, qs] = location.hash.slice(1).split('?');
+  if (r && (DEFAULTS[r] || r === 'myfirm' || r === 'about')) ST.route = r;
+  if (qs && DEFAULTS[ST.route]) new URLSearchParams(qs).forEach((val, key) => { if (key in DEFAULTS[ST.route]) ST.v[ST.route][key] = typeof DEFAULTS[ST.route][key] === 'number' ? Number(val) : val; });
+}
+function writeHash() {
+  const d = DEFAULTS[ST.route], v = ST.v[ST.route], p = new URLSearchParams();
+  if (d) for (const k in d) if (v[k] !== d[k]) p.set(k, v[k]);
+  const h = '#' + ST.route + (p.toString() ? '?' + p : '');
+  if (location.hash !== h) history.replaceState(null, '', h);
+}
+
+/* ---------- small view pieces ---------- */
+const ICON = {
+  dots: '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>',
+  full: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>',
+  menu: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>' };
+function chip(key, value, opts) {
+  const open = ST.open === key;
+  return `<span class="dd"><button class="chip" data-act="open" data-k="${key}" aria-expanded="${open}">${esc(value)} ▾</button>${open ? `<div class="pop" role="listbox">${opts.map(o => `<button class="opt" role="option" data-act="set" data-k="${key}" data-v="${esc(o.v)}"><span class="ck">${o.on ? '✓' : ''}</span><span>${esc(o.label)}${o.sub ? `<small>${esc(o.sub)}</small>` : ''}</span></button>`).join('')}</div>` : ''}</span>`;
+}
+const optsOf = (list, cur, subs) => list.map(v => ({ v, label: cap(String(v)), on: String(v) === String(cur), sub: subs && subs[v] }));
+function compare(key, cur, options, typedHtml) {
+  const open = ST.open === key, sel = options.find(o => o.v === cur);
+  return `<div class="cmprow"><span>Compare with</span><span class="dd"><button class="cmp ${cur !== 'none' ? 'on' : ''}" data-act="open" data-k="${key}" aria-expanded="${open}">${esc(sel.label)} ▾</button>${open ? `<div class="pop" style="width:330px" role="listbox">${options.map(o => `<button class="opt" role="option" data-act="set" data-k="${key}" data-v="${o.v}"><span class="ck">${o.v === cur ? '✓' : ''}</span><span><b style="font-weight:600">${esc(o.label)}</b><small>${esc(o.sub)}</small></span></button>`).join('')}</div>` : ''}</span>${typedHtml || ''}</div>`;
+}
+function card(id, title, sub, inner, opts = {}) {
+  const full = ST.full === id, open = ST.open === 'menu:' + id;
+  return `<section class="card ${full ? 'full' : ''}" aria-label="${esc(title)}">
+    <div class="ch"><div class="t"><h2>${title}</h2>${sub ? `<p>${sub}</p>` : ''}</div>
+    <span class="dd"><button class="icb" aria-label="Card actions" aria-expanded="${open}" data-act="open" data-k="menu:${id}">${ICON.dots}</button>${open ? `<div class="pop right" role="menu" style="min-width:220px">
+      <button class="opt" role="menuitem" data-act="full" data-k="${id}">${full ? 'Exit full screen' : 'Full screen'}</button>
+      ${opts.csv ? `<button class="opt" role="menuitem" data-act="csv" data-k="${id}">Download CSV</button>` : ''}
+      <button class="opt" role="menuitem" data-act="link">Copy link to this view</button></div>` : ''}</span>
+    <button class="icb" aria-label="${full ? 'Exit full screen' : 'Full screen'}" data-act="full" data-k="${id}">${ICON.full}</button></div>
+    ${inner}</section>`;
+}
+function rangeBar(q, you, fmt, tipTitle, opt = {}) {
+  const lo = Math.min(q[0], you ? you.v : 1e12) * .94, hi = Math.max(q[4], you ? you.v : 0) * 1.04, P = scale(lo, hi);
+  const t = `${tipTitle}\nMiddle half ${fmt(q[1])}–${fmt(q[3])}\n80% ${fmt(q[0])}–${fmt(q[4])}${opt.n ? '\n' + opt.n : ''}`;
+  return `<div class="range">
+    <span class="thin" data-tip="${esc(t)}" style="left:${P(q[0])}%;width:${P(q[4]) - P(q[0])}%"></span>
+    <span class="thick" data-tip="${esc(t)}" style="left:${P(q[1])}%;width:${P(q[3]) - P(q[1])}%"></span>
+    <span class="med" style="left:${P(q[2])}%"></span>
+    ${you ? `<span class="you ${you.est ? 'est' : ''}" style="left:${P(you.v)}%"></span><span class="tag ${you.est ? 'est' : ''}" style="left:${P(you.v)}%">${esc(you.label)}</span>` : ''}
+  </div><div class="rl"><span style="left:${P(q[1])}%;color:var(--soft)">${fmt(q[1])}</span><span style="left:${P(q[2])}%;color:var(--ink);font-weight:600">median ${fmt(q[2])}</span><span style="left:${P(q[3])}%;color:var(--soft)">${fmt(q[3])}</span></div>`;
+}
+const kpis = list => `<div class="kpis">${list.map(k => `<div class="kpi"><div class="l">${k[0]}</div><div class="v">${k[1]}</div><div class="s">${k[2]}</div></div>`).join('')}</div>`;
+function rowsChart(items, fmt, onPick) {
+  const all = items.flatMap(r => r.q ? [r.q[0], r.q[4]] : []).concat(items.filter(r => r.you != null).map(r => r.you));
+  const lo = Math.min(...all) * .92, hi = Math.max(...all) * 1.03, P = scale(lo, hi);
+  return `<div class="rows">${items.map(r => `<button class="row ${r.sel ? 'sel' : ''}" ${onPick ? `data-act="set" data-k="${onPick}" data-v="${esc(r.key)}"` : ''} aria-pressed="${!!r.sel}">
+    <span class="n">${esc(r.name)}</span>
+    <span class="bar">${r.q ? `<span class="thin" data-tip="${esc(r.tip)}" style="top:9px;left:${P(r.q[0])}%;width:${P(r.q[4]) - P(r.q[0])}%"></span><span class="thick" data-tip="${esc(r.tip)}" style="top:5px;height:12px;left:${P(r.q[1])}%;width:${P(r.q[3]) - P(r.q[1])}%"></span><span class="med" style="top:3px;height:16px;left:${P(r.q[2])}%"></span>` : `<span style="top:10px;left:0;right:0;border-top:2px dotted #C8C9C8"></span>`}
+    ${r.you != null ? `<span class="dia ${r.est ? 'est' : ''} ${r.risk ? 'risk' : ''}" style="left:${P(r.you)}%"></span>` : ''}</span>
+    <span class="v"><b>${r.value}</b><i>${r.sub}</i></span></button>`).join('')}</div>`;
+}
+function lineChart(id, years, series, fmt, H = 240) {
+  const all = series.flatMap(s => s.vals.filter(v => v != null).concat(s.band ? s.band.flat() : []));
+  const vmin = Math.min(...all) * .95, vmax = Math.max(...all) * 1.03, n = years.length;
+  const X = i => 30 + i * (540 / (n - 1)), Y = v => H - 16 - (v - vmin) / (vmax - vmin) * (H - 32);
+  const path = vals => vals.map((v, i) => v == null ? '' : (i && vals[i - 1] != null ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1)).join(' ');
+  let svg = '';
+  series.forEach(s => { if (s.band) svg += `<path d="${path(s.band.map(b => b[1]))} ${s.band.map((b, i) => 'L' + X(i).toFixed(1) + ' ' + Y(b[0]).toFixed(1)).reverse().join(' ')} Z" fill="${s.fill}"/>`; });
+  series.forEach(s => { svg += `<path d="${path(s.vals)}" fill="none" stroke="${s.color}" stroke-width="${s.w || 2}" ${s.dash ? 'stroke-dasharray="5 4"' : ''} vector-effect="non-scaling-stroke"/>`; });
+  series.forEach(s => s.vals.forEach((v, i) => { if (v != null && s.dots) svg += s.dots === 'dia' ? `<rect x="${X(i) - 4}" y="${Y(v) - 4}" width="8" height="8" transform="rotate(45 ${X(i)} ${Y(v)})" fill="${s.hollow && s.hollow(i) ? '#fff' : s.color}" stroke="${s.color}" stroke-width="2" vector-effect="non-scaling-stroke"/>` : `<circle cx="${X(i)}" cy="${Y(v)}" r="3.5" fill="#fff" stroke="${s.color}" stroke-width="2" vector-effect="non-scaling-stroke"/>`; }));
+  years.forEach((y, i) => { const lines = [String(y)].concat(series.filter(s => s.vals[i] != null || s.band).map(s => s.band ? `${s.name} ${fmt(s.band[i][0])}–${fmt(s.band[i][1])}` : `${s.name} ${fmt(s.vals[i])}`)); svg += `<rect x="${X(i) - 270 / (n - 1)}" y="0" width="${540 / (n - 1)}" height="${H}" fill="transparent" data-tip="${esc(lines.join('\n'))}" data-col="${id}:${i}"/>`; });
+  const grid = ticks(vmin, vmax, [10, 20, 25, 50, 100, 200, 250, 500, 1000]);
+  return `<div class="chart" style="height:${H}px">${grid.map(g => `<div style="position:absolute;left:0;right:0;top:${(Y(g) / H * 100).toFixed(2)}%;border-top:1px solid #EEEFEC"></div><span class="ylab" style="top:${(Y(g) / H * 100).toFixed(2)}%">${fmt(g)}</span>`).join('')}
+    <svg viewBox="0 0 600 ${H}" preserveAspectRatio="none" style="position:absolute;inset:0;height:${H}px">${svg}</svg></div>
+    <div class="xlab">${years.map((y, i) => `<span style="left:${(X(i) / 6).toFixed(2)}%">${y}</span>`).join('')}</div>`;
+}
+const conf = f => f >= 15 ? ['High confidence', 'var(--ok-bg)', 'var(--ok)'] : f >= 6 ? ['Medium confidence', 'var(--warn-bg)', 'var(--warn)'] : ['Low confidence', 'var(--sunk)', '#5A5B5A'];
+const pillHtml = c => `<span class="pill" style="background:${c[1]};color:${c[2]}">${c[0]}</span>`;
+function header(eyebrow, title, sub, q, cmp) {
+  return `<header class="head"><div class="wrap"><div class="eyebrow">${eyebrow}</div><h1 class="h1">${title}</h1>${sub ? `<p class="sub">${sub}</p>` : ''}${q ? `<div class="q">${q}</div>` : ''}${cmp || ''}</div></header>`;
+}
+
+/* ============================================================ RATES */
+function ratesModel(v) {
+  const o = OFFICES[v.office], p = PEERS[v.peer], pr = PRACTICES[v.practice], mm = o[0] * p[0] * pr[0], yf = o[1] * pr[1], k = o[2] * p[1] * pr[2];
+  const real = DATA.real && DATA.real.rates && DATA.real.rates[`${v.office}|${v.peer}|${v.practice}`];
+  return LEVELS.map(L => {
+    let q = PUB[L].map(x => x * mm), neg = NEGR[L], firms = Math.round(FIRMS[L] * k), n = Math.round(NRATES[L] * k);
+    if (real && real[L]) { q = real[L].pub; neg = real[L].neg ? real[L].neg / real[L].pub[2] : neg; firms = real[L].firms; n = real[L].n; }
+    const ok = firms >= 3 && n >= 10;
+    const you = v.cmp === 'card' ? CARD[L] * yf : v.cmp === 'estimate' ? (EST[L] ? EST[L] * yf : null) : v.cmp === 'typed' && L === v.level ? v.typed : null;
+    return { L, q, neg, firms, n, ok, you, pct: you != null ? pctOf(you, q) : null };
+  });
+}
+function pageRates() {
+  const v = ST.v.rates, rows = ratesModel(v), cur = rows.find(r => r.L === v.level), lvl = v.level.toLowerCase(), est = v.cmp === 'estimate';
+  const q = `<span class="w">What do</span>${chip('rates.level', lvl + 's', optsOf(LEVELS, v.level))}<span class="w">in</span>${chip('rates.office', v.office, optsOf(Object.keys(OFFICES), v.office))}<span class="w">at</span>${chip('rates.peer', v.peer, optsOf(Object.keys(PEERS), v.peer, Object.fromEntries(Object.entries(PEERS).map(([k, x]) => [k, x[2]]))))}<span class="w">charge for</span>${chip('rates.practice', v.practice, optsOf(Object.keys(PRACTICES), v.practice))}<span class="w">?</span>`;
+  const cmp = compare('rates.cmp', v.cmp, [
+    { v: 'none', label: 'Nothing', sub: 'Market only. Nothing about your firm is used.' },
+    { v: 'estimate', label: 'Our public-record estimate', sub: 'What filings say your firm charges. No upload.' },
+    { v: 'typed', label: 'A rate I type', sub: 'One level. Never saved.' },
+    { v: 'card', label: 'Our rate card', sub: 'From My Firm. Every level at once.' }],
+    v.cmp === 'typed' ? `<label>Your ${lvl} rate $ <input class="num" type="number" step="25" value="${v.typed}" data-act="input" data-k="rates.typed" aria-label="Your rate"></label><span class="notice">Only used on this screen. Never saved.</span>` : '');
+  const c = conf(cur.firms), on = cur.you != null, negPct = Math.round((1 - cur.neg) * 100);
+  const signal = !on ? '' : cur.pct < 40 ? `<b style="color:var(--cobalt-ink)">Room to raise.</b> ` : cur.pct <= 70 ? `<b style="color:var(--ink)">In line with peers.</b> ` : `<b style="color:var(--risk)">Priced near the top.</b> `;
+  const answer = card('rates-answer', `Typical ${lvl} rate`, `${esc(v.peer)} · ${esc(v.office)} · ${esc(v.practice)} · 2026`, `<div class="cb">
+    <div style="display:flex;gap:8px;align-items:center">${pillHtml(c)}<span style="font-size:12px;color:var(--soft)">${cur.firms} firms · ${cur.n} rates · public filings, RFPs and client rate cards, 2024–2026</span></div>
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;margin-top:8px"><div class="big">${$(cur.q[2])}<small>/hr</small></div>${on ? `<span class="ppill">${est ? 'about the ' : ''}${ord(cur.pct)} percentile</span>` : ''}</div>
+    <p class="lead">${signal}The middle half list ${$(cur.q[1])}–${$(cur.q[3])}. Clients pay about ${negPct}% below list.${on ? ` ${est ? 'We estimate yours' : 'Yours'} at ${$(cur.you)} is ${cur.you < cur.q[2] ? Math.round((1 - cur.you / cur.q[2]) * 100) + '% below' : Math.round((cur.you / cur.q[2] - 1) * 100) + '% above'} the median.` : v.cmp === 'estimate' ? ' Too few public filings to estimate your ' + lvl + ' rate.' : ''}</p>
+    ${rangeBar(cur.q, on ? { v: cur.you, est, label: (est ? 'Est. ~' : 'You ') + $(cur.you) } : null, $, `Listed ${lvl} rates`, { n: `${cur.firms} firms, ${cur.n} rates` })}
+    <div class="cap">Peers' listed rates: bar is the middle half, line is the median, whiskers cover 80%.</div>
+    ${est && on ? `<div style="margin-top:12px;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;background:var(--page);font-size:12.5px;color:var(--body)"><span style="flex:1">Estimated from 14 public fee filings by your firm, 2023–2025, grown to 2026. Medium confidence.</span><button class="ghost" data-act="set" data-k="rates.cmp" data-v="typed">Not right? Type yours</button></div>` : ''}
+    ${kpis([['Peers raised rates', '+5.8%', `68% of peer ${lvl}s raised theirs`], ['What clients actually pay', negPct + '% below list', 'negotiated median ' + $(cur.q[2] * cur.neg)], on ? ['2027 to hold your position', $(cur.you * 1.058), 'peer median would be ' + $(cur.q[2] * 1.058)] : ['Peer rates with a discount', '12%', 'typically 15% off']])}</div>`);
+  const sen = card('rates-seniority', 'Across seniority', 'Listed peer rates by level · click a level', rowsChart(rows.map(r => ({
+    key: r.L, name: r.L, sel: r.L === v.level, q: r.ok ? r.q : null, you: r.you, est, value: r.ok ? $(r.q[2]) : '—', sub: r.you != null ? (est ? 'est. ' : 'you ') + $(r.you) + ' · ' + ord(r.pct) : r.ok ? r.firms + ' firms' : 'too few firms',
+    tip: `${r.L}\nMiddle half ${$(r.q[1])}–${$(r.q[3])}\nMedian ${$(r.q[2])} · ${r.firms} firms` })), $, 'rates.level'), { csv: true });
+  const years = [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, '2027 est.'];
+  const yv = v.cmp === 'card' ? YY.map(f => CARD[v.level] * OFFICES[v.office][1] * PRACTICES[v.practice][1] * f).concat([null]) : null;
+  const time = card('rates-time', 'Rate over time', `Listed ${lvl} rates · 80% band · hover a year${yv ? '' : ' · compare with your rate card to add your line'}`, lineChart('rates', years, [
+    { name: '80% of peers', band: YF.map(f => [cur.q[0] * f, cur.q[4] * f]), fill: '#EAEEFF', vals: [] },
+    { name: 'Peer median', vals: YF.map(f => cur.q[2] * f), color: '#5A7BD6', dots: 'c' },
+    ...(yv ? [{ name: 'You', vals: yv, color: '#0025DE', w: 2.6, dots: 'dia' }] : [])], $) + '<div style="height:12px"></div>', { csv: true });
+  const sizeRows = SIZES.map(s => { const m = cur.q[2] / PEERS[v.peer][0] * s[2], q = [m * .7, m * .82, m, m * 1.18, m * 1.3]; return { key: s[0], name: s[0] + ' · ' + s[1], sel: !!s[3], q, value: $(m), sub: 'negotiated ' + $(m * cur.neg), tip: `${s[0]} firms (${s[1]})\nMedian listed ${$(m)}\nMiddle half ${$(q[1])}–${$(q[3])}` }; });
+  const size = card('rates-size', 'Across firm size', `${esc(v.level)} · ${esc(v.office)} · from records, all firms here · your size band is highlighted`, rowsChart(sizeRows, $), { csv: true });
+  const table = card('rates-table', 'Peer comparison', `Against ${esc(v.peer)} · aggregates only; cells under 3 firms or 10 rates are hidden`, `<div class="tblwrap"><table><thead><tr><th>Level</th><th>Listed median</th><th>Negotiated median</th><th>Clients pay</th>${rows.some(r => r.you != null) ? '<th style="color:var(--cobalt)">Yours</th><th style="color:var(--cobalt)">Percentile</th>' : ''}</tr></thead><tbody>${rows.map(r => `<tr class="${r.L === v.level ? 'sel' : ''}"><td>${r.L}</td><td>${r.ok ? $(r.q[2]) : '—'}</td><td>${r.ok ? $(r.q[2] * r.neg) : '—'}</td><td>${r.ok ? Math.round((1 - r.neg) * 100) + '% below list' : '—'}</td>${rows.some(x => x.you != null) ? `<td>${r.you != null ? (est ? '~' : '') + $(r.you) : '—'}</td><td>${r.you != null && r.ok ? ord(r.pct) : '—'}</td>` : ''}</tr>`).join('')}</tbody></table></div>`, { csv: true });
+  const unlock = v.cmp !== 'card' ? `<div class="unlock"><div style="flex:1"><div style="font-size:14.5px;font-weight:600;color:var(--ink)">See every level against the market at once</div><div style="font-size:12.5px;color:#3F434A;margin-top:2px">Add your rate card in My Firm and every chart shows your markers, with 2027 options per level. Your rates are only shown to you and never go into the market numbers.</div></div><button class="ghost" data-act="set" data-k="rates.cmp" data-v="card">Preview with a rate card</button></div>` : '';
+  return header('Benchmark', 'Rates', '', q, cmp) + `<div class="body">${answer}<div class="grid2">${sen}${time}</div>${size}${table}${unlock}</div>`;
+}
+
+/* ============================================================ SALARIES */
+function pageSalaries() {
+  const v = ST.v.salaries, o = OFFICES[v.office], p = PEERS[v.peer], mm = o[0] < .9 ? .9 : (o[0] === .94 ? .98 : o[0] === .9 ? .95 : 1);
+  const pm = { 'similar-size firms': 1, 'AmLaw 101–200 firms': 1.03, 'all firms': .88 }[v.peer], k = o[2] * p[1];
+  const yf = mm === 1 ? 1 : mm + .02;
+  const rows = ROLES.map((r, i) => { const q = QM.map(f => SMKT[i] * mm * pm * f), bonus = SBON[i] * mm * pm;
+    const you = v.cmp === 'scale' ? SYOU[i] * yf : v.cmp === 'posted' ? (i < 8 ? r5(SYOU[i] * yf * 1.01) : null) : v.cmp === 'typed' && r === v.role ? v.typed : null;
+    return { r, i, q, bonus, you, firms: Math.round(SFIRMS[i] * k), n: Math.round(SN[i] * k), pct: you != null ? pctOf(you, q) : null, top: STOP[i] * mm }; });
+  const cur = rows.find(x => x.r === v.role), role = v.role.toLowerCase(), est = v.cmp === 'posted', on = cur.you != null;
+  const inhouse = cur.q[2] * (cur.i < 3 ? .78 : .88);
+  const q = `<span class="w">What do</span>${chip('salaries.role', role + (role.endsWith('counsel') ? '' : 's'), optsOf(ROLES, v.role))}<span class="w">in</span>${chip('salaries.office', v.office, optsOf(Object.keys(OFFICES), v.office))}<span class="w">at</span>${chip('salaries.peer', v.peer, optsOf(Object.keys(PEERS), v.peer))}<span class="w">earn?</span>`;
+  const cmp = compare('salaries.cmp', v.cmp, [
+    { v: 'none', label: 'Nothing', sub: 'Market only. Nothing about your firm is used.' },
+    { v: 'posted', label: 'Our posted pay', sub: 'From your public job posts and NALP filing. No upload.' },
+    { v: 'typed', label: 'A salary I type', sub: 'One role. Never saved.' },
+    { v: 'scale', label: 'Our salary scale', sub: 'From My Firm. Every class year at once.' }],
+    v.cmp === 'typed' ? `<label>Base $ <input class="num" style="width:90px" type="number" step="5" value="${v.typed}" data-act="input" data-k="salaries.typed" aria-label="Base salary in thousands">k</label><span class="notice">Only used on this screen. Never saved.</span>` : '');
+  const signal = !on ? '' : cur.pct < 30 ? '<b style="color:var(--risk)">Retention risk.</b> ' : cur.pct <= 65 ? '<b style="color:var(--ink)">Competitive.</b> ' : '<b style="color:var(--cobalt-ink)">Paying above market.</b> ';
+  const answer = card('sal-answer', `Typical ${role} base salary`, `${esc(v.peer)} · ${esc(v.office)} · 2026`, `<div class="cb">
+    <div style="display:flex;gap:8px;align-items:center">${pillHtml(conf(cur.firms))}<span style="font-size:12px;color:var(--soft)">${cur.firms} firms · ${cur.n} salaries · Legal.io placements, postings and bar surveys</span></div>
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;margin-top:8px"><div class="big">${'$' + (Math.round(cur.q[2]) * 1000).toLocaleString('en-US')}<small> base</small></div>${on ? `<span class="ppill">${est ? 'about the ' : ''}${ord(cur.pct)} percentile</span>` : ''}</div>
+    <p class="lead">${signal}The middle half earn ${k$(cur.q[1])}–${k$(cur.q[3])}, plus a typical ${k$(cur.bonus)} bonus.${on ? ` ${est ? 'Your posted pay' : 'Yours'} at ${k$(cur.you)} is ${cur.you < cur.q[2] ? Math.round((1 - cur.you / cur.q[2]) * 100) + '% below' : Math.round((cur.you / cur.q[2] - 1) * 100) + '% above'} the median.` : ''}</p>
+    ${rangeBar(cur.q, on ? { v: cur.you, est, label: (est ? 'Est. ~' : 'You ') + k$(cur.you) } : null, k$, `${cap(role)} base`, { n: cur.firms + ' firms' })}
+    <div class="cap">Peers' base salaries: bar is the middle half, line is the median, whiskers cover 80%.</div>
+    ${kpis([['Typical bonus', k$(cur.bonus), 'total comp median ' + k$(cur.q[2] + cur.bonus)], ['Peers raised base pay', '+3.6%', 'this year'], ['In-house alternative', k$(inhouse), 'base, plus bonus and equity']])}</div>`);
+  const scale_ = card('sal-scale', 'By class year', 'Base salary · click a row · orange: below the 30th percentile', rowsChart(rows.slice(0, 8).map(x => ({
+    key: x.r, name: x.r.replace(' associate', ''), sel: x.r === v.role, q: x.q, you: x.you, est, risk: x.pct != null && x.pct < 30, value: x.you != null ? k$(x.you) : k$(x.q[2]), sub: x.you != null ? ord(x.pct) + ' percentile' : 'median',
+    tip: `${x.r}\nMiddle half ${k$(x.q[1])}–${k$(x.q[3])}\nMedian ${k$(x.q[2])}` })), k$, 'salaries.role'), { csv: true });
+  const YFs = [.78, .78, .88, .92, .92, .93, .965, 1], YYs = [.8, .8, .86, .9, .91, .94, .97, 1];
+  const yv = v.cmp === 'scale' ? YYs.map(f => cur.you * f) : null;
+  const time = card('sal-time', 'Salary over time', `${esc(cap(role))} base · 80% band · hover a year`, lineChart('sal', [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026], [
+    { name: '80% of peers', band: YFs.map(f => [cur.q[0] * f, cur.q[4] * f]), fill: '#EAEEFF', vals: [] },
+    { name: 'Peer median', vals: YFs.map(f => cur.q[2] * f), color: '#5A7BD6', dots: 'c' },
+    ...(yv ? [{ name: 'You', vals: yv, color: '#0025DE', w: 2.6, dots: 'dia' }] : [])], k$) + '<div style="height:12px"></div>', { csv: true });
+  const alts = [['Your peer set', v.peer, cur.q, cur.q[2] + cur.bonus], ['Top-scale firms', 'on the market scale', QM.map(f => cur.top * f), cur.top + cur.bonus * 1.6], ['In-house', 'companies, same experience', QM.map(f => inhouse * f), inhouse * 1.27], ['Government', 'federal and state', QM.map(f => cur.q[2] * .6 * f), cur.q[2] * .6]];
+  const alt = card('sal-alt', 'Where they could go instead', `Base and total comp for a ${esc(role)} in ${esc(v.office)}`, rowsChart(alts.map((a, i) => ({ key: a[0], name: a[0], sel: i === 0, q: a[2], you: on ? cur.you : null, est, value: k$(a[2][2]), sub: 'total ' + k$(a[3]), tip: `${a[0]} (${a[1]})\nBase middle half ${k$(a[2][1])}–${k$(a[2][3])}\nMedian total comp ${k$(a[3])}` })), k$), { csv: true });
+  return header('Benchmark', 'Salaries', '', q, cmp) + `<div class="body">${answer}<div class="grid2">${scale_}${time}</div>${alt}</div>`;
+}
+
+/* ============================================================ MATTERS */
+function pageMatters() {
+  const v = ST.v.matters, T = MTYPES[v.type], ph = Math.min(v.phase, T.ph.length - 1), pp = MPEERS[v.peer];
+  const full = T.base * STAKES[v.stakes] * pp[0], med = full * T.cum[ph] / T.cum[T.def], q = MQ.map(f => med * f), n = Math.round(T.n * pp[1] * (v.stakes === '$1–10M at stake' ? 1 : .6));
+  const RATES = [CARD['Partner'], CARD['Counsel'], CARD['Senior associate'], CARD['Associate'], CARD['Junior associate'], CARD['Paralegal']];
+  const PEERR = [1483, 1303, 1109, 841, 662, 455];
+  const blendedPeer = T.mix.reduce((a, s, i) => a + s * PEERR[i], 0), hours = Math.round(med * 1e6 / blendedPeer / 10) * 10;
+  const useMine = v.cmp === 'plan', R = useMine ? RATES : PEERR;
+  const staff = LEVELS.map((L, i) => { const h = Math.round(hours * T.mix[i] / 5) * 5; return { L, h, rate: R[i], cost: h * R[i] }; });
+  const planMine = LEVELS.reduce((a, L, i) => a + Math.round(hours * T.mix[i] / 5) * 5 * RATES[i], 0) / 1e6, shown = staff.reduce((a, x) => a + x.cost, 0) / 1e6;
+  const fee = v.cmp === 'typed' ? v.typed / 1e6 : useMine ? planMine : v.cmp === 'past' ? med * .94 : null, on = fee != null && fee > 0, est = v.cmp === 'past';
+  const pct = on ? pctOf(fee, q) : null;
+  const qline = `<span class="w">What does a</span>${chip('matters.type', v.type, optsOf(Object.keys(MTYPES), v.type))}<span class="w">with</span>${chip('matters.stakes', v.stakes, optsOf(Object.keys(STAKES), v.stakes))}<span class="w">cost through</span>${chip('matters.phase', T.ph[ph], T.ph.map((x, i) => ({ v: i, label: cap(x), on: i === ph })))}<span class="w">at</span>${chip('matters.peer', v.peer, optsOf(Object.keys(MPEERS), v.peer))}<span class="w">?</span>`;
+  const cmp = compare('matters.cmp', v.cmp, [
+    { v: 'none', label: 'Nothing', sub: 'Market only. Nothing about your firm is used.' },
+    { v: 'past', label: 'Our past public cases', sub: 'From court fee records naming your firm. No upload.' },
+    { v: 'typed', label: 'A fee I type', sub: 'Test a proposal. Never saved.' },
+    { v: 'plan', label: 'Staffing plan at our rates', sub: 'Typical hours at your rate card (from My Firm).' }],
+    v.cmp === 'typed' ? `<label>Your fee $ <input class="num" style="width:130px" type="number" step="50000" value="${v.typed}" data-act="input" data-k="matters.typed" aria-label="Your fee in dollars"></label><span class="notice">Only used on this screen. Never saved.</span>` : '');
+  const signal = !on ? '' : pct < 35 ? '<b style="color:var(--cobalt-ink)">Your fee is on the low side.</b> ' : pct <= 70 ? '<b style="color:var(--ink)">Your fee is in the market range.</b> ' : '<b style="color:var(--risk)">Your fee is above most comparable matters.</b> ';
+  const answer = card('mat-answer', 'Typical total fees', `${esc(v.type)} · through ${esc(T.ph[ph])} · ${esc(v.peer)}`, `<div class="cb">
+    <div style="display:flex;gap:8px;align-items:center">${pillHtml(n >= 20 ? conf(20) : n >= 10 ? conf(8) : conf(1))}<span style="font-size:12px;color:var(--soft)">${n} comparable matters · court fee records, RFP budgets and Legal.io matters, 2019–2026</span></div>
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;margin-top:8px"><div class="big">${M$(med)}</div>${on ? `<span class="ppill">${est ? 'about the ' : ''}${ord(pct)} percentile</span>` : ''}</div>
+    <p class="lead">${signal}The middle half of comparable matters cost ${M$(q[1])}–${M$(q[3])}; 80% fall within ${M$(q[0])}–${M$(q[4])}.</p>
+    ${rangeBar(q, on ? { v: fee, est, label: (est ? 'Your past cases ~' : useMine ? 'Your plan ' : 'Your fee ') + M$(fee) } : null, M$, 'Total fees', { n: n + ' matters' })}
+    <div class="cap">Comparable matters: bar is the middle half, line is the median, whiskers cover 80%.</div>
+    ${kpis([['Typical duration', (T.ph.length === 5 ? 10 + ph * 7 : 3 + ph * 3) + ' months', 'to the end of ' + T.ph[ph]], ['Full matter, median', M$(full * T.cum[T.cum.length - 1] / T.cum[T.def]), 'through ' + T.ph[T.ph.length - 1]], ['Typical staffing cost', M$(shown), useMine ? 'at your rates' : 'at peer median rates']])}</div>`);
+  const fc = T.cum.map(c => full * c / T.cum[T.def]);
+  const phase = card('mat-phase', 'Cost by phase', 'Cumulative fees · click to price through a phase', rowsChart(T.ph.map((x, i) => ({ key: i, name: 'Through ' + x, sel: i === ph, q: MQ.map(f => fc[i] * f), value: M$(fc[i]), sub: Math.round(T.cum[i] / T.cum[T.cum.length - 1] * 100) + '% of full matter', you: i === ph && on ? fee : null, est, tip: `Through ${x}\nMedian ${M$(fc[i])}\nMiddle half ${M$(fc[i] * MQ[1])}–${M$(fc[i] * MQ[3])}` })), M$, 'matters.phase'), { csv: true });
+  const sizes = card('mat-size', 'By firm size', `Same matter through ${esc(T.ph[ph])}, by who handled it`, rowsChart(SIZES.map(s => { const m = med / pp[0] * [.62, .7, .88, 1.05, 1.5][SIZES.indexOf(s)]; return { key: s[0], name: s[0], sel: !!s[3], q: [m * .6, m * .76, m, m * 1.33, m * 1.7], you: on ? fee : null, est, value: M$(m), sub: s[1], tip: `${s[0]} firms (${s[1]})\nMedian ${M$(m)}` }; }), M$), { csv: true });
+  const staffT = card('mat-staff', 'Typical staffing', `Typical hours through ${esc(T.ph[ph])}, priced at ${useMine ? 'your rate card' : 'peer median rates'}`, `<div class="tblwrap"><table><thead><tr><th>Role</th><th>Typical hours</th><th>Share</th><th style="color:var(--cobalt)">${useMine ? 'Your rate' : 'Peer rate'}</th><th style="color:var(--cobalt)">Cost</th></tr></thead><tbody>${staff.map(x => `<tr><td>${x.L}</td><td>${x.h.toLocaleString('en-US')}</td><td>${pc(x.h / hours)}</td><td>${$(x.rate)}</td><td><b>${M$(x.cost / 1e6)}</b></td></tr>`).join('')}<tr><td><b>Total</b></td><td><b>${staff.reduce((a, x) => a + x.h, 0).toLocaleString('en-US')}</b></td><td></td><td>blended ${$(shown * 1e6 / staff.reduce((a, x) => a + x.h, 0))}</td><td><b>${M$(shown)}</b></td></tr></tbody></table></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 20px 16px;flex-wrap:wrap"><span style="font-size:12.5px;color:var(--body);flex:1">${useMine ? 'At your rates this plan lands at the ' + ord(pctOf(planMine, q)) + ' percentile of comparable matters.' : 'Priced at peer median rates. Compare with your rate card to price it at yours.'}</span><button class="ghost" data-act="set" data-k="matters.cmp" data-v="${useMine ? 'none' : 'plan'}">${useMine ? 'Back to market only' : 'Price at my rate card'}</button></div>`, { csv: true });
+  return header('Benchmark', 'Matters', '', qline, cmp) + `<div class="body">${answer}<div class="grid2">${phase}${sizes}</div>${staffT}</div>`;
+}
+
+/* ============================================================ VISIBILITY */
+function pageVisibility() {
+  const v = ST.v.visibility, base = { 'patent litigation': 18, 'labor & employment': 26, 'M&A': 9, 'restructuring': 14 }[v.practice];
+  const peers = [['Ashford Lane', 41], ['Calder & Moss', 34], ['Brennan Whitlock', 29], ['Dunmore Reyes', 24], ['Ellery Stone', 21], ['Fairbanks Coyle', 19], ['Granger Holt', 15], ['Hollis & Pratt', 12], ['Iverson Blake', 10], ['Keene Marlow', 8], ['Lorimer Shaw', 6], ['Mercer Vale', 4]];
+  const pf = base / 18, all = peers.map(([n, x]) => [n, x * Math.sqrt(pf)]).concat([['Harlow & Pierce', base, true]]).sort((a, b) => b[1] - a[1]);
+  const rank = all.findIndex(x => x[2]) + 1, median = all[6][1];
+  const q = `<span class="w">When buyers look for</span>${chip('visibility.practice', v.practice, optsOf(['patent litigation', 'labor & employment', 'M&A', 'restructuring'], v.practice))}<span class="w">counsel, do they find us against</span>${chip('visibility.peers', v.peers, optsOf(['our 12 named peers', 'similar-size firms'], v.peers))}<span class="w">?</span>`;
+  const tiles = `<div class="tiles">${[['AI visibility', base + '%', 'of AI answers name your firm', '#0025DE'], ['Rank', '#' + rank + ' of 13', 'leader ' + Math.round(all[0][1]) + '% · peer median ' + Math.round(median) + '%', '#5A7BD6'], ['Questions won', '3 of 5', 'tracked buyer questions that name you', '#85A9E3'], ['RFP invitations', '3', 'on Legal.io, last 90 days', '#8C8478']].map(t => `<div class="tile" style="border-top:3px solid ${t[3]}"><div class="l" style="color:${t[3]}">${t[0]}</div><div class="v">${t[1]}</div><div class="s">${t[2]}</div></div>`).join('')}</div>`;
+  const weeks = Array.from({ length: 13 }, (_, i) => i === 12 ? 'now' : (12 - i) + 'w');
+  const trend = card('vis-trend', 'Share of AI answers that name you', 'Weekly · hover a week', lineChart('vis', weeks, [
+    { name: 'Most visible peer', vals: weeks.map((_, i) => all[0][1] * (1.03 - .05 * i / 12) + Math.cos(i) * 1.2), color: '#B6B0A6', dash: true },
+    { name: 'Peer median', vals: weeks.map((_, i) => median * (.97 + .04 * Math.sin(i * .7))), color: '#85A9E3' },
+    { name: 'You', vals: weeks.map((_, i) => base * (.82 + .18 * i / 12) + Math.sin(i * 1.3) * .9), color: '#0025DE', w: 2.6 }], x => Math.round(x) + '%', 220) + '<div style="height:12px"></div>', { csv: true });
+  const ranking = card('vis-rank', 'Who buyers hear about', 'Your peers in AI answers', `<div class="tblwrap"><table><thead><tr><th>#  Firm</th><th>Visibility</th><th>Share of voice</th></tr></thead><tbody>${all.slice(0, 7).concat(rank > 7 ? [all[rank - 1]] : []).map(x => `<tr class="${x[2] ? 'sel' : ''}"><td>${all.indexOf(x) + 1}  ${x[0]}${x[2] ? ' <span class="pro">YOU</span>' : ''}</td><td>${Math.round(x[1])}%</td><td>${(x[1] / all.reduce((a, y) => a + y[1], 0) * 100).toFixed(1)}%</td></tr>`).join('')}</tbody></table></div><p class="foot">From the public answers AI tools give to your tracked questions. All firm names in this prototype are fictional.</p>`);
+  const funnel = card('vis-funnel', 'On Legal.io: from search to RFP', 'Companies looking for this practice, last 90 days · free on every plan', `<div class="cb"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">${[['Appeared in searches', 410, 1], ['Card viewed', 98, .24], ['Profile opened', 33, .08], ['Shortlisted', 8, .02], ['Invited to RFP', 3, .0075]].map(f => `<div><div style="font-size:12px">${f[0]}</div><div style="font-size:24px;font-weight:600;color:var(--ink)">${f[1]}</div><div style="height:6px;border-radius:3px;background:var(--sunk);margin-top:6px"><div style="height:6px;border-radius:3px;background:var(--cobalt);width:${Math.max(3, Math.sqrt(f[2]) * 100)}%"></div></div></div>`).join('')}</div><p class="about" style="margin-top:10px">Counts only. Which companies looked stays private unless they invite you.</p></div>`);
+  const acts = [['High', 'Publish attorney bios on your Legal.io profile', 'People shows 0 published. Profiles with people get 3× more card views.'], ['High', 'Get listed in Legal 500 for ' + v.practice, 'Cited in 22% of answers where peers appear.'], ['Medium', 'Star your top 5 practice areas', 'Clients skim the first areas on your card.'], ['Low', 'Confirm your office locations', '0 of 4 confirmed.']];
+  const actions = card('vis-actions', 'What would raise it', 'Ranked by expected lift', acts.map((a, i) => `<div class="li"><span class="pill" style="background:${a[0] === 'High' ? 'var(--risk-bg)' : a[0] === 'Medium' ? 'var(--warn-bg)' : 'var(--sunk)'};color:${a[0] === 'High' ? 'var(--risk)' : a[0] === 'Medium' ? 'var(--warn)' : '#5A5B5A'}">${a[0]}</span><div style="flex:1"><div style="color:var(--ink);text-decoration:${ST.done[i] ? 'line-through' : 'none'}">${a[1]}</div><div style="font-size:12px;color:var(--soft)">${a[2]}</div></div><button class="ghost" data-act="done" data-k="${i}">${ST.done[i] ? 'Undo' : 'Mark done'}</button></div>`).join('') + '<div style="height:8px"></div>');
+  return header('Win Work · Pro', 'Visibility', 'When buyers look for a firm, in AI answers and on Legal.io, do they find you?', q) + `<div class="body">${tiles}<div class="grid2">${trend}${ranking}</div>${funnel}${actions}</div>`;
+}
+
+/* ============================================================ MY FIRM + ABOUT */
+function pageMyFirm() {
+  return header('Win Work', 'My Firm', 'What clients see on your card. Each step raises how often you show up.') + `<div class="body">
+    <div class="tiles">${[['Proposals', '1', 'awaiting your response'], ['Panel clients', '4', 'clients who panel you'], ['Locations', '4', '0 confirmed'], ['People', '0', 'published to clients'], ['Visibility', '18%', '#7 of 13 peers in AI answers']].map((t, i) => `<div class="tile" ${i === 4 ? 'style="border-color:#B9C6F5"' : ''}><div class="l" style="color:${i === 4 ? 'var(--cobalt-ink)' : 'var(--soft)'}">${t[0]}</div><div class="v">${t[1]}</div><div class="s">${t[2]}${i === 4 ? ` · <a href="#visibility">see more</a>` : ''}</div></div>`).join('')}</div>
+    ${card('mf-strength', 'Profile strength · 40%', 'Your data stays private: it only adds "You" markers to Benchmark pages.', [['Firm details and About', true], ['Rate card (adds markers on Rates and prices staffing in Matters)', false], ['Salary scale (adds markers on Salaries)', false], ['Publish attorney bios', false], ['Star your top 5 practice areas', false]].map(s => `<div class="li"><span style="width:18px;height:18px;border-radius:50%;border:2px solid ${s[1] ? '#03824D' : '#C8C9C8'};background:${s[1] ? '#03824D' : '#fff'};color:#fff;font-size:11px;display:inline-flex;align-items:center;justify-content:center">${s[1] ? '✓' : ''}</span><span style="flex:1;color:var(--ink)">${s[0]}</span></div>`).join('') + '<div style="height:8px"></div>')}</div>`;
+}
+function pageAbout() {
+  return header('Prototype', 'About this prototype', '') + `<div class="body"><div class="card"><div class="cb" style="padding-top:18px;font-size:14px;color:var(--body);line-height:1.6">
+    <p style="margin-top:0"><b>What it is.</b> A clickable design for the law-firm side of client.legal.io: how a firm could see market rates, salaries and matter costs, plus a paid Visibility page. No production code.</p>
+    <p><b>Data.</b> ${DATA.source === 'snapshot' ? `Rates use a snapshot of real Benchmark aggregates taken ${esc(DATA.asOf)}; the rest is illustrative.` : 'All numbers are illustrative, shaped on Benchmark aggregates. Harlow &amp; Pierce and every peer firm on Visibility are fictional.'}</p>
+    <p><b>The rules.</b> Every page leads with the market and works with no firm data. One "Compare with" control (default: Nothing) adds a "You" marker. Typed numbers are never saved. Uploaded data is only shown to that firm. Cells under 3 firms or 10 data points are hidden.</p>
+    <p style="margin-bottom:0"><b>Open questions.</b> Named peer sets and the minimum-cell rule; whether firms may see negotiated rates; colour meaning (above market isn't bad for a firm); whether "2027 to hold" reads as advice; how Visibility is priced and who buys it.</p></div></div></div>`;
+}
+
+/* ============================================================ shell */
+const NAV = [['sec', 'Hire Talent'], ['x', 'My Jobs'], ['x', 'Bring Your Own Talent'], ['x', 'Find Candidates'], ['sec', 'Win Work'], ['myfirm', 'My Firm'], ['x', 'Proposals'], ['visibility', 'Visibility', 'PRO'], ['sec', 'Benchmark'], ['rates', 'Rates'], ['salaries', 'Salaries'], ['matters', 'Matters']];
+function shell(inner) {
+  return `<div class="app ${ST.navopen ? 'navopen' : ''}"><nav class="side" aria-label="Main"><div class="brand">Harlow &amp; Pierce</div>
+    <button class="nav dim" disabled>Dashboard</button><button class="nav dim" disabled>Ask Lex</button>
+    ${NAV.map(n => n[0] === 'sec' ? `<div class="sec">${n[1]}</div>` : n[0] === 'x' ? `<button class="nav dim" disabled title="Not part of this prototype">${n[1]}</button>` : `<a class="nav" href="#${n[0]}" ${ST.route === n[0] ? 'aria-current="page"' : ''}>${n[1]}${n[2] ? `<span class="pro">${n[2]}</span>` : ''}</a>`).join('')}
+    <div style="flex:1"></div><a class="nav" href="#about" ${ST.route === 'about' ? 'aria-current="page"' : ''}>About this prototype</a></nav>
+    <div class="main"><div class="top"><button class="icb menu" aria-label="Open menu" data-act="navtoggle">${ICON.menu}</button><span class="notice"><b>Prototype.</b> ${DATA.source === 'snapshot' ? 'Rates from a Benchmark snapshot (' + esc(DATA.asOf) + '); other figures illustrative.' : 'Illustrative numbers.'} Firm names are fictional.</span><div style="flex:1"></div><span class="pill" style="background:var(--sunk);color:#5A5B5A">${DATA.source === 'snapshot' ? 'Snapshot data' : 'Illustrative'}</span></div>
+    ${inner}</div></div>
+    ${ST.full ? '<button class="scrim" aria-label="Exit full screen" data-act="full" data-k=""></button>' : ''}
+    ${ST.toast ? `<div class="toast" role="status">${esc(ST.toast)}</div>` : ''}`;
+}
+function render() {
+  const pages = { rates: pageRates, salaries: pageSalaries, matters: pageMatters, visibility: pageVisibility, myfirm: pageMyFirm, about: pageAbout };
+  document.getElementById('root').innerHTML = shell(pages[ST.route]());
+  writeHash();
+}
+function toast(msg) { ST.toast = msg; render(); clearTimeout(toast.t); toast.t = setTimeout(() => { ST.toast = null; render(); }, 2200); }
+
+/* ---------- events ---------- */
+function setPath(key, val) {
+  const [page, field] = key.split('.'); const d = DEFAULTS[page][field];
+  ST.v[page][field] = typeof d === 'number' ? Number(val) : val;
+  if (page === 'matters' && field === 'type') ST.v.matters.phase = MTYPES[val].def;
+  if (field === 'cmp' && val === 'typed') { if (page === 'rates') { const r = ratesModel(ST.v.rates).find(x => x.L === ST.v.rates.level); ST.v.rates.typed = r5(EST[ST.v.rates.level] ? EST[ST.v.rates.level] * OFFICES[ST.v.rates.office][1] : r.q[2]); } }
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (!b) { if (ST.open) { ST.open = null; render(); } if (ST.navopen && !e.target.closest('.side')) { ST.navopen = false; render(); } return; }
+  const act = b.dataset.act, k = b.dataset.k;
+  if (act === 'open') ST.open = ST.open === k ? null : k;
+  else if (act === 'set') { setPath(k, b.dataset.v); ST.open = null; }
+  else if (act === 'full') { ST.full = ST.full === k || !k ? null : k; ST.open = null; }
+  else if (act === 'link') { ST.open = null; navigator.clipboard && navigator.clipboard.writeText(location.href); return toast('Link to this exact view copied'); }
+  else if (act === 'csv') { ST.open = null; downloadCsv(k); return toast('CSV downloaded'); }
+  else if (act === 'done') ST.done[k] = !ST.done[k];
+  else if (act === 'navtoggle') ST.navopen = !ST.navopen;
+  else return;
+  render();
+});
+document.addEventListener('change', e => { const t = e.target; if (t.dataset && t.dataset.act === 'input') { setPath(t.dataset.k, t.value || 0); render(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && (ST.open || ST.full)) { ST.open = null; ST.full = null; render(); } });
+window.addEventListener('hashchange', () => { readHash(); ST.open = null; ST.full = null; ST.navopen = false; render(); window.scrollTo(0, 0); });
+const tipEl = document.getElementById('tip');
+document.addEventListener('mousemove', e => {
+  const t = e.target.closest && e.target.closest('[data-tip]');
+  if (!t) { tipEl.style.display = 'none'; return; }
+  tipEl.textContent = t.getAttribute('data-tip'); tipEl.style.display = 'block';
+  const w = tipEl.offsetWidth, x = Math.min(window.innerWidth - w - 8, Math.max(8, e.clientX - w / 2));
+  tipEl.style.left = x + 'px'; tipEl.style.top = Math.max(8, e.clientY - tipEl.offsetHeight - 14) + 'px';
+});
+function downloadCsv(id) {
+  const card = document.querySelector(`[data-act="csv"][data-k="${id}"]`) ? null : null;
+  const sec = [...document.querySelectorAll('section.card')].find(s => s.querySelector(`[data-k="menu:${id}"]`));
+  let rows = [];
+  const tbl = sec && sec.querySelector('table');
+  if (tbl) rows = [...tbl.querySelectorAll('tr')].map(tr => [...tr.children].map(c => c.textContent.trim()));
+  else if (sec) rows = [['Item', 'Value', 'Detail']].concat([...sec.querySelectorAll('.row')].map(r => [r.querySelector('.n').textContent, r.querySelector('.v b').textContent, r.querySelector('.v i').textContent]));
+  if (!rows.length && sec) rows = [...sec.querySelectorAll('[data-col]')].map(r => r.getAttribute('data-tip').split('\n'));
+  const csv = rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = id + '.csv'; a.click();
+}
+
+/* ---------- boot: try a real-data snapshot, then render ---------- */
+readHash();
+render();
+</script>
+</body>
+</html>
