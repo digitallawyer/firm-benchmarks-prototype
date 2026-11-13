@@ -24,8 +24,12 @@ h1,h2{margin:0;color:var(--ink)}
 .nav .dim{color:#A3A3A3}
 .pro{margin-left:auto;height:18px;padding:0 6px;border-radius:6px;background:var(--cobalt-050);color:var(--cobalt-ink);font-size:10px;font-weight:700;display:inline-flex;align-items:center}
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
-.top{height:44px;display:flex;align-items:center;gap:10px;padding:0 14px;background:#fff;border-bottom:1px solid var(--line)}
-.top{display:none}
+.top{height:48px;display:flex;align-items:center;gap:10px;padding:0 14px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50}
+.jump{display:flex;align-items:center;justify-content:space-between;width:300px;max-width:45vw;height:30px;padding:0 6px 0 10px;background:#F5F6F5;border-radius:8px;font-size:12.5px;color:#A3A3A3;cursor:text}
+.kbd{display:inline-flex;gap:3px}.kbd b{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:4px;background:#EAEBEA;color:#5A5B5A;font-size:10.5px;font-weight:600}
+.tbtn{display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 14px;border:1px solid #EBEDF1;border-radius:999px;background:#fff;font-size:12.5px;font-weight:500;color:var(--ink);cursor:pointer;text-decoration:none}
+.tbtn:hover{border-color:#C8C9C8;text-decoration:none}
+.app.collapsed .side{display:none}
 .notice{font-size:12px;color:var(--soft)}
 .notice b{color:var(--ink);font-weight:600}
 .pill{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:8px;font-size:11px;font-weight:700}
@@ -132,7 +136,7 @@ tbody tr:hover td{background:var(--page)}
 @media (max-width:820px){
   .side{position:fixed;left:0;top:0;bottom:0;z-index:70;transform:translateX(-100%);transition:transform .2s;box-shadow:0 0 40px rgba(0,0,0,.2)}
   .app.navopen .side{transform:none}
-  .top{display:flex}
+  .jump span:first-child{display:none}.jump{width:auto}
   .wrap,.body{padding-left:16px;padding-right:16px}
   .h1{font-size:30px}.big{font-size:42px}
   .row{grid-template-columns:110px minmax(0,1fr) 92px;gap:8px}
@@ -473,7 +477,7 @@ function pageCandidates() {
   const exp = [['Contracts', 18197], ['Litigation', 16030], ['Business and Corporate', 9476], ['Intellectual Property', 8203], ['Commercial', 6707], ['Privacy', 3165], ['Securities', 2896]];
   const bars = (list, max) => list.map(x => `<div style="display:grid;grid-template-columns:160px minmax(0,1fr) 64px;gap:10px;align-items:center;height:28px" data-tip="${esc(x[0] + '\n' + x[1].toLocaleString('en-US') + ' legal professionals')}"><span style="font-size:13px;color:var(--ink)">${x[0]}</span><span style="height:10px;border-radius:5px;background:var(--sunk);position:relative;display:block"><span style="position:absolute;left:0;top:0;bottom:0;width:${x[1] / max * 100}%;background:#2F5FB3;border-radius:5px;display:block"></span></span><span style="text-align:right;font-size:12.5px;color:var(--body)">${x[1].toLocaleString('en-US')}</span></div>`).join('');
   return `<header class="head"><div class="wrap" style="display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap"><div style="flex:1"><h1 class="h1" style="font-size:30px">Find Candidates</h1><p class="sub">Reach 128,062 candidates in the Legal.io network</p></div><button class="ghost">Schedule Meeting</button><button class="ghost" style="background:var(--ink);color:#fff;border-color:var(--ink)">+ New Hire</button></div><div class="wrap" style="padding-top:0;display:flex;gap:8px"><span class="ghost" style="border-radius:8px">Any Legal Role ▾</span><span class="ghost" style="border-radius:8px">United States ▾</span></div></header>
-    <div class="body"><div class="card"><div class="ch"><div class="t"><h2>By city</h2><p>Where the network is · the live app shows this as a map</p></div></div><div class="cb">${bars(cities, 5162)}</div></div><div class="card"><div class="ch"><div class="t"><h2>By expertise</h2></div></div><div class="cb">${bars(exp, 18197)}</div></div></div>`;
+    <div class="body"><div class="card"><div class="ch"><div class="t"><h2>By city</h2><p>Legal professionals in the network, by city</p></div></div><div class="cb">${bars(cities, 5162)}</div></div><div class="card"><div class="ch"><div class="t"><h2>By expertise</h2></div></div><div class="cb">${bars(exp, 18197)}</div></div></div>`;
 }
 function pageProposals() {
   const tab = ST.proptab;
@@ -528,10 +532,16 @@ function pageAbout() {
 /* ============================================================ shell */
 const NAV = [['dashboard', 'Dashboard'], ['lex', 'Ask Lex'], ['sec', 'Hire Talent'], ['jobs', 'My Jobs'], ['byot', 'Bring Your Own Talent'], ['candidates', 'Find Candidates'], ['sec', 'Win Work'], ['myfirm', 'My Firm'], ['proposals', 'Proposals'], ['visibility', 'Visibility'], ['sec', 'Benchmark'], ['rates', 'Rates'], ['salaries', 'Salaries'], ['matters', 'Matters']];
 function shell(inner) {
-  return `<div class="app ${ST.navopen ? 'navopen' : ''}"><nav class="side" aria-label="Main"><div class="brand">Harlow &amp; Pierce</div>
+  return `<div class="app ${ST.navopen ? 'navopen' : ''} ${ST.collapsed ? 'collapsed' : ''}"><nav class="side" aria-label="Main"><div class="brand">Harlow &amp; Pierce</div>
     ${NAV.map(n => n[0] === 'sec' ? `<div class="sec">${n[1]}</div>` : n[0] === 'x' ? `<button class="nav dim" disabled title="Not part of this prototype">${n[1]}</button>` : `<a class="nav" href="#${n[0]}" ${ST.route === n[0] ? 'aria-current="page"' : ''}>${n[1]}${n[2] ? `<span class="pro">${n[2]}</span>` : ''}</a>`).join('')}
 </nav>
-    <div class="main"><div class="top"><button class="icb menu" aria-label="Open menu" data-act="navtoggle">${ICON.menu}</button><span style="font-weight:600;color:var(--ink)">Harlow &amp; Pierce</span></div>
+    <div class="main"><div class="top">
+      <button class="icb" aria-label="Toggle sidebar" data-act="navtoggle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+      <label class="jump"><span>Jump to or navigate</span><span class="kbd"><b>⌘</b><b>K</b></span></label>
+      <div style="flex:1"></div>
+      <button class="tbtn">+ New</button>
+      <a class="tbtn" href="#lex"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"/></svg>Ask</a>
+      <button class="icb" aria-label="Account"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3"/><path d="M6.5 18c1.5-2 3.4-3 5.5-3s4 1 5.5 3"/></svg></button></div>
     ${inner}</div></div>
     ${ST.full ? '<button class="scrim" aria-label="Exit full screen" data-act="full" data-k=""></button>' : ''}
     ${ST.toast ? `<div class="toast" role="status">${esc(ST.toast)}</div>` : ''}`;
@@ -566,7 +576,7 @@ document.addEventListener('click', e => {
   else if (act === 'star') { const n = PRACTICE_AREAS.filter(p => ST.mf.stars[p]).length; if (ST.mf.stars[k]) delete ST.mf.stars[k]; else if (n < 5) ST.mf.stars[k] = true; else return toast('You can star up to 5 areas'); }
   else if (act === 'mf') ST.mf[k] = !ST.mf[k];
   else if (act === 'scroll') { e.preventDefault(); const el = document.getElementById(k); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
-  else if (act === 'navtoggle') ST.navopen = !ST.navopen;
+  else if (act === 'navtoggle') { if (window.innerWidth <= 820) ST.navopen = !ST.navopen; else ST.collapsed = !ST.collapsed; }
   else return;
   render();
 });
